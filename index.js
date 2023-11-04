@@ -8,7 +8,7 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 // const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.swu9d.mongodb.net/?retryWrites=true&w=majority`;
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.ivnezkj.mongodb.net/?retryWrites=true&w=majority`;
 
@@ -37,6 +37,20 @@ async function run() {
         .skip(page * size)
         .limit(size)
         .toArray();
+      res.send(result);
+    });
+
+    app.post("/productByIds", async (req, res) => {
+      const ids = req.body;
+      console.log(ids);
+      const idsWithObjectId = ids.map((id) => new ObjectId(id));
+      const query = {
+        _id: {
+          $in: idsWithObjectId,
+        },
+      };
+      const result = await productCollection.find(query).toArray();
+      console.log(result);
       res.send(result);
     });
 
